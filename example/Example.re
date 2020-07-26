@@ -17,9 +17,19 @@ let _ =
     },
   );
 
-let _ = Socket.connect(socket);
+Socket.connect(socket);
 
 let channel = socket |> Channel.make("test", Js.Obj.empty());
 
-channel ->
-Channel.push("test", Js.Obj.empty(), None);
+channel
+->Channel.join(~timeout=1000, ())
+->Push.receive(~status="ok", ~callback=params => {Js.log(params)})
+->Push.receive(~status="error", ~callback=params => {Js.log(params)});
+
+channel->Channel.push(~event="test", ~payload=Js.Obj.empty(), ());
+
+channel->Channel.leave();
+
+let presence = Presence.make(channel);
+
+presence->Presence.onLeave(a => {Js.log(a)});
