@@ -30,6 +30,17 @@ channel->Channel.push(~event="test", ~payload=Js.Obj.empty(), ());
 
 channel->Channel.leave();
 
-let presence = Presence.make(channel);
+type presenceType = {
+  phx_ref: string,
+  id: string,
+};
 
-presence->Presence.onLeave(a => {Js.log(a)});
+//TO-DO: Pass type instead of example (if possible)
+let presence = Presence.make({phx_ref: "", id: ""}, channel, ());
+
+presence->
+Presence.onLeave((~id, ~currentPresence, ~newPresence) => {
+  Js.log(id);
+  Js.log(currentPresence);
+  Js.log(newPresence);
+});
