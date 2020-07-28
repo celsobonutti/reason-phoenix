@@ -11,9 +11,8 @@ let _ = Socket.onOpen(socket, () => {Js.log("It works!")});
 let _ =
   Socket.onClose(
     socket,
-    test => {
-      let a = test##testing;
-      Js.log(a);
+    () => {
+      Js.log("Test");
     },
   );
 
@@ -30,17 +29,28 @@ channel->Channel.push(~event="test", ~payload=Js.Obj.empty(), ());
 
 channel->Channel.leave();
 
-type presenceType = {
-  phx_ref: string,
-  id: string,
+module PresenceObject = {
+  type t = {
+    phx_ref: string,
+    id: int,
+    name: string,
+  };
 };
 
-//TO-DO: Pass type instead of example (if possible)
-let presence = Presence.make({phx_ref: "", id: ""}, channel, ());
+module PresenceMod = Presence.MakeModule(PresenceObject);
 
-presence->
-Presence.onLeave((~id, ~currentPresence, ~newPresence) => {
+let presence = PresenceMod.make(channel, None);
+
+open PresenceMod;
+
+presence->onLeave((~id, ~currentPresence, ~newPresence) => {
   Js.log(id);
-  Js.log(currentPresence);
-  Js.log(newPresence);
+  switch (unwrap(currentPresence), unwrap(newPresence)) {
+  | (None, None) => Js.log("No presences!")
+  | (None, Some({id: userId, phx_ref: _})) =>
+    Js.log({j|New user: $userId|j})
+  | (Some({id: userId, phx_ref}), Some(_)) =>
+    Js.log({j| User $userId logged from a new device: $phx_ref"|j})
+  | _ => Js.log("Something ins very, very wrong around here.")
+  };
 });
