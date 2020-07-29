@@ -15,7 +15,7 @@ module rec Push: {
 and Channel: {
   type t;
 
-  type ref = int;
+  type ref;
 
   [@bs.module "phoenix"] [@bs.new]
   external make: (string, 'a, Socket.t) => t = "Channel";
