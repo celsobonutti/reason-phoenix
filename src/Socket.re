@@ -10,9 +10,9 @@ type messageArgs('a) = {
   topic: string,
 };
 
-type protocol = [ | `wss | `ws];
+type protocol = /* [ | `wss | `ws] */ string; 
 
-type binaryType = [ | `blob | `arraybuffer];
+type binaryType = /* [ | `blob | `arraybuffer] */ string;
 
 type logger('a) = (~kind: string, ~msg: string, ~data: 'a) => unit;
 
