@@ -1,3 +1,4 @@
+// Describe your socket params type
 type example = {username: string};
 
 let socket =
@@ -6,17 +7,17 @@ let socket =
     Some(Socket.options(~transport="test", ~params={username: "test"}, ())),
   );
 
-let _ = Socket.onOpen(socket, () => {Js.log("It works!")});
+let _ = Socket.onOpen(socket, () => {Js.log("Socket connection open.")});
 
 let _ =
   Socket.onClose(
     socket,
     () => {
-      Js.log("Test");
+      Js.log("Socket was closed.");
     },
   );
 
-Socket.connect(socket);
+let _ = Socket.connect(socket);
 
 let channel = socket |> Channel.make("test", Js.Obj.empty());
 
@@ -29,6 +30,19 @@ channel->Channel.push(~event="test", ~payload=Js.Obj.empty(), ());
 
 channel->Channel.leave();
 
+/** 
+Create a module with a type t
+This should describe your presence payload, as it is in your server
+Plus a phx_ref that is sent by default by Phoenix
+
+i.e., if you have this in your server;
+Presence.track(socket, socket.assigns.user.id, %{
+  id: socket.assigns.user.id, => integer
+  name: socket.assigns.user.name => string
+})
+
+You use the following module:
+*/
 module PresenceObject = {
   type t = {
     phx_ref: string,
@@ -37,13 +51,14 @@ module PresenceObject = {
   };
 };
 
+// Create a Presence module that expects to receive your record as its payload
 module PresenceMod = Presence.MakeModule(PresenceObject);
 
 let presence = PresenceMod.make(channel, None);
 
 open PresenceMod;
 
-presence->onLeave((~id, ~currentPresence, ~newPresence) => {
+presence->onJoin((~id, ~currentPresence, ~newPresence) => {
   Js.log(id);
   switch (unwrap(currentPresence), unwrap(newPresence)) {
   | (None, None) => Js.log("No presences!")
