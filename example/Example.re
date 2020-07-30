@@ -21,14 +21,12 @@ let _ = Socket.connect(socket);
 
 let channel = socket |> Channel.make("test", Js.Obj.empty());
 
-channel
+let _ = channel
 ->Channel.join(~timeout=1000, ())
 ->Push.receive(~status="ok", ~callback=params => {Js.log(params)})
 ->Push.receive(~status="error", ~callback=params => {Js.log(params)});
 
-channel->Channel.push(~event="test", ~payload=Js.Obj.empty(), ());
-
-channel->Channel.leave();
+let _ = channel->Channel.push(~event="test", ~payload=Js.Obj.empty(), ());
 
 /** 
 Create a module with a type t
