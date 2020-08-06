@@ -4,31 +4,26 @@ type example = {username: string};
 let socket =
   Socket.make(
     "/socket",
-    Some(Socket.options(~transport="test", ~params={username: "test"}, ())),
+    Some(Socket.options(~transport=`longpoll, ~params={username: "test"}, ())),
   );
 
 let _ = Socket.onOpen(socket, () => {Js.log("Socket connection open.")});
 
-let _ =
-  Socket.onClose(
-    socket,
-    () => {
-      Js.log("Socket was closed.");
-    },
-  );
+let _ = Socket.onClose(socket, () => {Js.log("Socket was closed.")});
 
 let _ = Socket.connect(socket);
 
 let channel = socket |> Channel.make("test", Js.Obj.empty());
 
-let _ = channel
-->Channel.join(~timeout=1000, ())
-->Push.receive(~status="ok", ~callback=params => {Js.log(params)})
-->Push.receive(~status="error", ~callback=params => {Js.log(params)});
+let _ =
+  channel
+  ->Channel.join(~timeout=1000, ())
+  ->Push.receive(~status="ok", ~callback=params => {Js.log(params)})
+  ->Push.receive(~status="error", ~callback=params => {Js.log(params)});
 
 let _ = channel->Channel.push(~event="test", ~payload=Js.Obj.empty(), ());
 
-/** 
+/**
 Create a module with a type t
 This should describe your presence payload, as it is in your server
 Plus a phx_ref that is sent by default by Phoenix

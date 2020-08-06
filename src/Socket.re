@@ -10,16 +10,20 @@ type messageArgs('a) = {
   topic: string,
 };
 
-type protocol = /* [ | `wss | `ws] */ string; 
+type protocol = [ | `wss | `ws]; 
 
-type binaryType = /* [ | `blob | `arraybuffer] */ string;
+type binaryType = [ | `blob | `arraybuffer];
+
+type connectionState = [ | `closed | `errored | `joined | `joining | `leaving ];
+
+type transport = [ | `longpoll | `websocket];
 
 type logger('a) = (~kind: string, ~msg: string, ~data: 'a) => unit;
 
 [@bs.deriving abstract]
 type options('a, 'b) = {
   [@bs.optional]
-  transport: string,
+  transport,
   [@bs.optional]
   timeout: int,
   [@bs.optional]
@@ -55,7 +59,7 @@ external log: (t, ~kind: string, ~msg: string, ~param: 'a) => unit = "log";
 [@bs.send] external onError: (t, 'a => unit) => ref = "onError";
 [@bs.send]
 external onMessage: (t, messageArgs('a) => unit) => ref = "onMessage";
-[@bs.send] external connectionState: t => unit = "connectionState";
-[@bs.send] external isConnected: t => unit = "isConnected";
+[@bs.send] external connectionState: t => connectionState = "connectionState";
+[@bs.send] external isConnected: t => bool = "isConnected";
 [@bs.send] external makeRef: t => ref = "makeRef";
 [@bs.send] external push: (t, messageArgs('a)) => unit = "push";
