@@ -13,7 +13,7 @@ let _ = Socket.onClose(socket, () => {Js.log("Socket was closed.")});
 
 let _ = Socket.connect(socket);
 
-let channel = socket |> Channel.make("test", Js.Obj.empty());
+let channel = socket -> Channel.make("test", Js.Obj.empty());
 
 let _ =
   channel

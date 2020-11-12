@@ -17,8 +17,8 @@ and Channel: {
 
   type ref;
 
-  [@bs.module "phoenix"] [@bs.new]
-  external make: (string, 'a, Socket.t) => t = "Channel";
+  [@bs.send]
+  external make: (Socket.t, string, 'a) => t = "channel";
 
   [@bs.send] external join: (t, ~timeout: int=?, unit) => Push.t = "join";
   [@bs.send]
