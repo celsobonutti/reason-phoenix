@@ -5,7 +5,7 @@ module MakeModule = (Presence: PresenceModule) => {
 
   type presence = {metas: array(Presence.t)};
 
-  type presences = Belt.Map.String.t(presence);
+  type presences = Js.Dict.t(presence);
 
   type diff = {
     joins: presences,
@@ -50,8 +50,7 @@ module MakeModule = (Presence: PresenceModule) => {
   [@bs.set] external onLeave: (t, presenceCallback) => unit = "onLeave";
   [@bs.set] external onJoin: (t, presenceCallback) => unit = "onJoin";
 
-  let unwrap = (presence) => {
-    presence.metas
-    -> Belt.Array.get(0);
-  }
+  let unwrap = presence => {
+    presence.metas->Belt.Array.get(0);
+  };
 };
